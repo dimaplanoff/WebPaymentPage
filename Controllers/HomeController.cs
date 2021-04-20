@@ -82,7 +82,7 @@ namespace PayPage.Controllers
             {
                 if (order == null || string.IsNullOrEmpty(order))
                 {
-                    ViewData[Config.vd_ServerMessageStatus] = "Неверный номер операции";
+                    ViewData[Config.vd_ServerMessageStatus] = "Неверный номер";
                     return View(page);
                 }
                 else
@@ -176,21 +176,21 @@ namespace PayPage.Controllers
             {
                 if (int.TryParse(card, out int account))
                 {
-                    object sia_v = new Rc.SIA_Validate()
+                    object sia_v = new Rc.Validate()
                     {
                         account = account
                     };
 
                     decimal decamount;
                     if (sum != null && decimal.TryParse(sum, out decamount))
-                        ((Rc.SIA_Validate)sia_v).amount = decamount;
+                        ((Rc.Validate)sia_v).amount = decamount;
 
-                    if (_rc_context.SpExec(Config.DbPrefixRc + "spname", ref sia_v))
+                    if (_rc_context.SpExec(Config.DbPrefixRc + "Validate", ref sia_v))
                     {
-                        if (((Rc.SIA_Validate)sia_v).error_code == 0 && ((Rc.SIA_Validate)sia_v).tariff_price == 0)
+                        if (((Rc.Validate)sia_v).error_code == 0 && ((Rc.Validate)sia_v).tariff_price == 0)
                             return null;
                         else
-                            return new JsonResult(new { text = ((Rc.SIA_Validate)sia_v).error_text, price = ((Rc.SIA_Validate)sia_v).tariff_price });
+                            return new JsonResult(new { text = ((Rc.Validate)sia_v).error_text, price = ((Rc.Validate)sia_v).tariff_price });
                     }
 
 
@@ -231,13 +231,13 @@ namespace PayPage.Controllers
                     else
                     {
                         var amount = (int)(decamount * 100);
-                        object sia_v = new Rc.SIA_Validate()
+                        object sia_v = new Rc.Validate()
                         {
                             account = account,
                             amount = decamount
                         };                       
 
-                        var isOk = _rc_context.SpExec(Config.DbPrefixRc + "spname", ref sia_v) && ((Rc.SIA_Validate)sia_v).error_code == 0;
+                        var isOk = _rc_context.SpExec(Config.DbPrefixRc + "Validate", ref sia_v) && ((Rc.Validate)sia_v).error_code == 0;
 
                         if (!isOk)
                         {
@@ -245,8 +245,8 @@ namespace PayPage.Controllers
                             return View();
                         }
 
-                        if (((Rc.SIA_Validate)sia_v).tariff_price > 0)
-                            register_toSber.amount = (int)(((Rc.SIA_Validate)sia_v).tariff_price * 100);
+                        if (((Rc.Validate)sia_v).tariff_price > 0)
+                            register_toSber.amount = (int)(((Rc.Validate)sia_v).tariff_price * 100);
                         else
                             register_toSber.amount = amount;
 

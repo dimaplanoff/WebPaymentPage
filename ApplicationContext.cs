@@ -105,7 +105,7 @@ namespace Rc
 
     }
 
-    public class SIA_Validate
+    public class Validate
     {
         [StringLength(128)]
         public string txn_id { get; set; }
@@ -122,9 +122,9 @@ namespace Rc
     }
 
 
-    public class SIA_Create
+    public class Create
     {
-        [StringLength(128)]
+        [StringLength(32)]
         public string txn_id { get; set; }
         public int account { get; set; }
         public decimal amount { get; set; }
