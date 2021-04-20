@@ -47,27 +47,7 @@ namespace PayPage.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult PayResultTest()
-        {
-            try
-            {
-                SberClasses.Register_toSber register_toSber = new SberClasses.Register_toSber()
-                {
-                    amount = 1000,
-                    orderNumber = Guid.NewGuid().ToString().Replace("-", "0").ToUpper()
-                };
-                Config.SetSessionValue(HttpContext, Config.ss_SberValues_register_toSber);
-                ViewData[Config.vd_ServerMessagePay] = $"Операция {register_toSber.orderNumber} на  {(int)(register_toSber.amount / 100)}руб. {(register_toSber.amount % 100)}коп. ушла";
-                ViewData[Config.vd_TmpStatus + register_toSber.orderNumber] = 0;
-                ViewData[Config.vd_TmpValue + register_toSber.orderNumber] = register_toSber.orderNumber;
-            }
-            catch (Exception e)
-            {
-                Log.Write(e);
-            }
-            return View("PayResult");
-        }
+       
 
         [HttpGet]
         public IActionResult PayStatus()
