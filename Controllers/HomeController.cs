@@ -58,7 +58,7 @@ namespace PayPage.Controllers
                     orderNumber = Guid.NewGuid().ToString().Replace("-", "0").ToUpper()
                 };
                 Config.SetSessionValue(HttpContext, Config.ss_SberValues_register_toSber);
-                ViewData[Config.vd_ServerMessagePay] = $"Операция № {register_toSber.orderNumber} на сумму {(int)(register_toSber.amount / 100)}руб. {(register_toSber.amount % 100)}коп. отправлена в обработку со статусом: тестовая операция";
+                ViewData[Config.vd_ServerMessagePay] = $"Операция {register_toSber.orderNumber} на  {(int)(register_toSber.amount / 100)}руб. {(register_toSber.amount % 100)}коп. ушла";
                 ViewData[Config.vd_TmpStatus + register_toSber.orderNumber] = 0;
                 ViewData[Config.vd_TmpValue + register_toSber.orderNumber] = register_toSber.orderNumber;
             }
@@ -131,7 +131,7 @@ namespace PayPage.Controllers
                 Config.SetSessionValue(HttpContext, Config.ss_SberValues_getOrderStatusExtended_toSber,getOrderStatusExtended_toSber);
                 Config.SetSessionValue(HttpContext, Config.ss_SberValues_getOrderStatusExtended_fromSber,getOrderStatusExtended_fromSber);
 
-                ViewData[Config.vd_ServerMessagePay] = $"Операция № {getOrderStatusExtended_fromSber.orderNumber} на сумму {(int)(getOrderStatusExtended_fromSber.amount/100)}руб. {(getOrderStatusExtended_fromSber.amount % 100)}коп. отправлена в обработку со статусом: {getOrderStatusExtended_fromSber.errorMessage}";
+                ViewData[Config.vd_ServerMessagePay] = $"Операция {getOrderStatusExtended_fromSber.orderNumber} на {(int)(getOrderStatusExtended_fromSber.amount/100)}руб. {(getOrderStatusExtended_fromSber.amount % 100)}коп. ушла";
                 ViewData[Config.vd_TmpStatus + register_toSber.orderNumber] = getOrderStatusExtended_fromSber.errorCode;
                 ViewData[Config.vd_TmpValue + register_toSber.orderNumber] = getOrderStatusExtended_fromSber.orderNumber;
                 return View("PayResult");
@@ -158,7 +158,7 @@ namespace PayPage.Controllers
             try
             {
                 object parametrs = new Sb.CheckOrderStatus() { orderNumber = orderNumber };
-                _sb_context.SpExec(Config.DbPrefixSb + "CheckOrderStatus", ref parametrs);
+                _sb_context.SpExec(Config.DbPrefixSb + "Check", ref parametrs);
 
                 return new JsonResult(((Sb.CheckOrderStatus)parametrs).answer);
             }
@@ -182,10 +182,10 @@ namespace PayPage.Controllers
                     };
 
                     decimal decamount;
-                    if (sum != null && decimal.TryParse(sum.Replace(".", ","), out decamount))
+                    if (sum != null && decimal.TryParse(sum, out decamount))
                         ((Rc.SIA_Validate)sia_v).amount = decamount;
 
-                    if (_rc_context.SpExec(Config.DbPrefixRc + "SIA_Validate", ref sia_v))
+                    if (_rc_context.SpExec(Config.DbPrefixRc + "spname", ref sia_v))
                     {
                         if (((Rc.SIA_Validate)sia_v).error_code == 0 && ((Rc.SIA_Validate)sia_v).tariff_price == 0)
                             return null;
@@ -217,7 +217,7 @@ namespace PayPage.Controllers
 
                 if (string.IsNullOrEmpty(card) || !int.TryParse(card, out int account))
                 {
-                    ViewData[Config.vd_ServerMessagePay] = "Неверный номер карты";
+                    ViewData[Config.vd_ServerMessagePay] = "Неверный номер";
                     return View();
                 }
                 else
@@ -225,7 +225,7 @@ namespace PayPage.Controllers
                     if (sum == null || !decimal.TryParse(sum.Replace(".", ","), out decimal decamount))
                     {
 
-                        ViewData[Config.vd_ServerMessagePay] = "Неверная сумма пополнения";
+                        ViewData[Config.vd_ServerMessagePay] = "Неверная сумма";
                         return View();
                     }
                     else
@@ -237,11 +237,11 @@ namespace PayPage.Controllers
                             amount = decamount
                         };                       
 
-                        var isOk = _rc_context.SpExec(Config.DbPrefixRc + "SIA_Validate", ref sia_v) && ((Rc.SIA_Validate)sia_v).error_code == 0;
+                        var isOk = _rc_context.SpExec(Config.DbPrefixRc + "spname", ref sia_v) && ((Rc.SIA_Validate)sia_v).error_code == 0;
 
                         if (!isOk)
                         {
-                            ViewData[Config.vd_ServerMessagePay] = "Номер карты не зарегистрирован в системе";
+                            ViewData[Config.vd_ServerMessagePay] = "Номер карты не зарегистрирован";
                             return View();
                         }
 
@@ -252,8 +252,8 @@ namespace PayPage.Controllers
 
                         register_toSber.userName = LNet.apiLogin;
                         register_toSber.password = LNet.apiPass;
-                        register_toSber.orderNumber = Guid.NewGuid().ToString().Replace('-', Config.RndChar()).ToUpper().Substring(0,32);
-                        register_toSber.returnUrl = Config.ReturnUrl + "GetRes";
+                        register_toSber.orderNumber = Guid.NewGuid().ToString();
+                        register_toSber.returnUrl = Config.ReturnUrl + "result";
 
                         Config.SetSessionValue(HttpContext, Config.ss_OrderInfo, new Sb.OrderInfo()
                         {
@@ -305,7 +305,7 @@ namespace PayPage.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return null;// View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
