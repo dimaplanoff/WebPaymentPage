@@ -1,0 +1,34 @@
+﻿<script> 
+    function showSt(orderNumber, timeout) {
+
+        var newtimeout = timeout + 1;
+
+        if (orderNumber == '')
+            return;
+
+        $.ajax({
+            type: "POST",
+            data: { orderNumber: orderNumber },
+            async: true,
+            dataType: 'json',
+            url: "site",
+            success: function (item) {
+                $('#check').html(item);
+                if (item != null || newtimeout > 100)
+                    return;
+                else
+                    setTimeout(function () {
+                        showStatus(orderNumber, newtimeout);
+                    }, newtimeout * 1000);
+                return;
+            },
+            error: function (r) {
+                $('#check').html('');
+                setTimeout(function () {
+                    showStatus(orderNumber, newtimeout);
+                }, newtimeout * 1000);
+                return;
+            }
+        });
+    }  
+</script>

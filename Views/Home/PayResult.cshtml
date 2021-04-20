@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Платеж совершен";
+    SberClasses.Register_toSber register_toSber = Config.GetSessionValue<SberClasses.Register_toSber>(Context, Config.ss_SberValues_register_toSber);
+    await Html.RenderPartialAsync("_script");
+}
+
+<div class="bg-light col-auto mx-auto">
+
+<h5 class="col-auto mx-auto my-2 text-center">@ViewData[Config.vd_ServerMessagePay]</h5>
+
+<div id="check"></div>
+
+<div class="col-auto mx-auto my-2 text-center"><a asp-area="" asp-controller="Home" asp-action="Index">Вернуться на главную</a></div>
+
+</div>
+
+<script>
+    showSt('@ViewData[Config.vd_TmpValue+ register_toSber.orderNumber]');
+</script>
+
+
+
+

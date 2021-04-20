@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Статус";
+    await Html.RenderPartialAsync("_script");
+}
+
+<h5 id="checkOrderStatus" class="col-auto mx-auto my-2 text-center">@ViewData[Config.vd_ServerMessageStatus]</h5>
+
+
+
+
+@using (Html.BeginForm("PayStatus", "Home", FormMethod.Post, new { id = "StatForm", @class = "form bg-dark" }))
+{
+
+<h6 class="col-auto mx-auto my-2 text-center">Cтатус операции</h6>
+
+<div class="input-group col-auto mx-auto my-2">
+    <div class="input-group-prepend">
+        <span class="input-group-text">Номер операции</span>
+    </div>
+    <input name="order" type="text" class="form-control">
+</div>
+
+<input type="submit" value="Проверить" class="form-control" />
+
+}
+
+<div class="col-auto mx-auto my-2 text-center"><a asp-area="" asp-controller="Home" asp-action="Index">Вернуться на главную</a></div>
+
+<script>
+    showSt('@ViewData[Config.vd_TmpValue]');
+</script>
+

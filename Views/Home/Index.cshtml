@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Платежная страница";
+}
+
+
+
+
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { id = "pfData", @class = "form bg-dark" }))
+{
+
+    <h5 class="text-center">Пополнение карты</h5>
+    <h6 class="text-center">@ViewData[Config.vd_ServerMessagePay]</h6>
+
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">blablabla</span>
+        </div>
+        <input name="card" type="number" class="form-control">
+    </div>
+
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">blablabla</span>
+        </div>
+        <input name="sum" step=0.5 type="number" class="form-control">
+    </div>
+
+    <input type="submit"/>
+
+    
+
+    <div class="col-auto mx-auto mt-2 text-center bigHref"><a asp-area="" asp-controller="Home" asp-action="PayStatus">Проверить статус</a></div>
+}
+
+<script>    
+
+    var thread = null;
+
+    $('#pfData input[name="card"]').keyup(function () {
+
+        if (thread != null)
+            clearTimeout(thread);
+
+        var card = $('#pfData input[name="card"]').val();
+        var suminput = $('#pfData input[name="sum"]');
+
+        if (card != '') {
+
+            thread = setTimeout(function () {
+
+            ///checkFunc
+
+            }, 300);
+
+        }
+        else {          
+                suminput.removeAttr('readonly');
+        }
+
+    });
+
+</script>
+
+
+
+
+@if (!string.IsNullOrEmpty((string)ViewData[Config.vd_Redirect]))
+{
+    <script>window.location.href = '@ViewData[Config.vd_Redirect]'</script>
+}
+
+
+
