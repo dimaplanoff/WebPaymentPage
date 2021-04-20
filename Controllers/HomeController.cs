@@ -202,7 +202,7 @@ namespace PayPage.Controllers
                 }
                 else
                 {
-                    if (sum == null || !decimal.TryParse(sum.Replace(".", ","), out decimal decamount))
+                    if (sum == null || !decimal.TryParse(sum, out decimal decamount))
                     {
 
                         ViewData[Config.vd_ServerMessagePay] = "Неверная сумма";
